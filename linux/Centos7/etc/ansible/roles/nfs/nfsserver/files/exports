@@ -1,0 +1,5 @@
+/data/data0   172.16.1.0/24(rw,sync,all_squash)
+/data/data1   172.16.1.0/24(rw,sync,all_squash)
+/data/data2   172.16.1.0/24(rw,sync,all_squash)
+/data/data3   172.16.1.0/24(rw,sync,all_squash)
+/data/data4   172.16.1.0/24(rw,sync,all_squash)

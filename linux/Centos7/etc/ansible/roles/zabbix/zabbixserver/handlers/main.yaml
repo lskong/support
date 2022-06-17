@@ -1,0 +1,55 @@
+- name: restart_zabbix
+  service: 
+    name: "{{ item }}"
+    state: restarted
+  loop:
+    - zabbix-server
+    - zabbix-agent
+    - httpd
+    - mariadb
+
+- name: remove_user
+  mysql_user:
+    name: ''
+    host_all: yes
+    state: absent
+
+- name: remove_test
+  mysql_db:
+    name: test
+    state: absent
+
+- name: set_password
+  mysql_user:
+    name: root
+    password: '123456'
+    update_password: always
+
+- name: adddb_zabbix
+  mysql_db:
+    login_user: root
+    login_password: '123456'
+    name: 'zabbix'
+    encoding: utf8
+    state: present
+
+- name: create_user
+  mysql_user:
+    login_user: 'root'
+    login_password: '123456'
+    name: 'zabbix'
+    password: 'zabbix'
+    host: "{{ item }}"
+    priv: 'zabbix.*:ALL,GRANT'
+    state: present
+  loop:
+    - localhost
+    - 172.16.1.%
+
+- name: import_sql
+  mysql_db:
+    login_user: zabbix
+    login_password: 'zabbix'
+    name: zabbix
+    state: import
+    target: /server/scripts/zabbix.sql

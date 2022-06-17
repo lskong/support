@@ -1,0 +1,8 @@
+- name: boot nfs-service
+  service:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  with_items:
+    - rpcbind.socket
+    - rpcbind

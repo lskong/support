@@ -1,0 +1,5 @@
+- name: send pub-key
+  copy: src=pub-key_distribution.sh dest=/server/scripts/ mode=755
+
+- name: exec sh
+  shell: removes=/server/scripts/pub-key_distribution.sh  /bin/sh

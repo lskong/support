@@ -1,0 +1,4 @@
+- name: yum install rsync.service
+  yum:
+    name: rsync
+    state: installed

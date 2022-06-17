@@ -1,0 +1,5 @@
+- hosts: nfsserver
+  gather_facts: no
+  roles:
+    - basic
+    - nfsserver

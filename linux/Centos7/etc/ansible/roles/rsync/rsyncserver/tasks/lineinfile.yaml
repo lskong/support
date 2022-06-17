@@ -1,0 +1,5 @@
+- name: postfix service conf modify
+  lineinfile:
+    path: /etc/postfix/main.cf
+    regexp: '^inet_interfaces ='
+    line: 'inet_interfaces = all'

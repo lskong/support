@@ -1,0 +1,5 @@
+- name: Add user
+  user:
+    name: rsync
+    create_home: no
+    shell: /sbin/nologin

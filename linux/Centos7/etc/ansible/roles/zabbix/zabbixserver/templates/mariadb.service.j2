@@ -1,0 +1,23 @@
+[Unit]
+Description=MariaDB database server
+After=syslog.target
+After=network.target
+
+[Service]
+Type=simple
+User=mysql
+Group=mysql
+
+LimitNOFILE=65535
+LimitNPROC=65535
+
+ExecStartPre=/usr/libexec/mariadb-prepare-db-dir %n
+ExecStart=/usr/bin/mysqld_safe --basedir=/usr
+ExecStartPost=/usr/libexec/mariadb-wait-ready $MAINPID
+
+TimeoutSec=300
+
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

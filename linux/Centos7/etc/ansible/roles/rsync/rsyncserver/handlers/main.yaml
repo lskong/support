@@ -1,0 +1,4 @@
+- name: restart rsyncd server
+  service:
+    name: rsyncd
+    state: restarted

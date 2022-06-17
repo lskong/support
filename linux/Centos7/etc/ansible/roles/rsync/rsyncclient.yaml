@@ -1,0 +1,5 @@
+- hosts: rsyncclient
+  gather_facts: no
+  roles:
+    - basic
+    - rsyncclient

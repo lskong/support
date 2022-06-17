@@ -1,0 +1,5 @@
+- name: copy exports file
+  copy:
+    src: 'exports'
+    dest: '/etc'
+  notify: restart nfs service

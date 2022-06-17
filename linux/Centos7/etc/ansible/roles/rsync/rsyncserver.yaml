@@ -1,0 +1,5 @@
+- hosts: rsyncserver
+  gather_facts: no
+  roles:
+    - basic
+    - rsyncserver

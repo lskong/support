@@ -1,0 +1,6 @@
+- name: check nfs service start
+  shell: showmount -e localhost
+  register: check_nfs_start
+- name: display nfs check
+  debug:
+    msg: "{{ check_nfs_start }}"

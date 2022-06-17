@@ -1,0 +1,6 @@
+- name: mount nfs data0
+  mount:
+    src: 172.16.1.3:/data/data0
+    path: /data0
+    state: mounted
+    fstype: nfs

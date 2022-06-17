@@ -1,0 +1,4 @@
+- name: send hosts file
+  copy:
+    src: '/etc/hosts'
+    dest: '/etc/'

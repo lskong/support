@@ -1,0 +1,109 @@
+#==========================================================                   			   
+# Ansible Playbooks
+#----------------------------------------------------------
+# The Playbooks is CentOS7 service deploy of nfs  
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Auther:   	Rockchou			   
+# Time:		    2020-04-14 08:50  
+# QQ:			48009202
+# Email:		rockchou@foxmail.com	   
+# Version   	1.0					   
+#----------------------------------------------------------
+# Update:							   
+# Auther:							   
+# Version:
+# Modfiy module：						   
+#----------------------------------------------------------							   
+# Update:							   
+# Auther:							   
+# Version:
+# Modfiy module：
+# 			
+#==========================================================
+
+
+#==========================================================
+# About the host module of Playbooks
+#----------------------------------------------------------
+# 
+# [nfs]
+#   [nfs_server]
+#   [nfs_client]
+# [inotify]
+# 
+#==========================================================
+
+
+# [nfs]
+- hosts: nfs
+  remote_user: root
+  tasks:
+    - name: 101-modify hostname
+      raw: "echo {{ hostname|quote }} >/etc/hostname"
+    - name: 102-exec hostname
+      shell: hostname {{ hostname|quote }} 
+    - name: 103-install nfs-utils
+      yum:
+        name: nfs-utils
+        state: installed
+
+        
+# [nfs_server]
+- hosts: nfs_server
+  vars:
+    a_path: /server/ansible
+    s_path: /server/scripts
+    s_dir: /data/data[0:4]
+  remote_user: root
+  tasks:
+    - name: 201-create data directory
+      file:
+        name: "{{ s_dir }}"
+        state: directory
+        owner: nfsnobody
+        group: nfsnobody
+    - name: 202-nfs share directory conf
+      copy:
+        src: "{{ a_path }}/conf/nfs_exports.conf"
+        dest: /etc/exports
+    - name: 203-start rpcbind
+      service:
+        name: rpcbind
+        enabled: yes
+        state: started
+    - name: 204-start nfs-server
+      service:
+        name: nfs-server
+        enabled: yes
+        state: started
+    - name: 205-test mount
+      shell: showmount -e localhost
+      register: ts_nfs_mount
+    - name: 206-display nfs mount
+      debug:
+        #var: "{{ ts_nfs_mount.stdout_lines }}"
+        msg: "{{ ts_nfs_mount }}"
+ 
+# [nfs_client]
+- hosts: nfs_client
+  vars:
+    a_path: /server/ansible
+    s_path: /server/scripts
+    m_dir: /data/test
+    r_nfs: 172.16.1.3
+  remote_user: root
+  tasks:
+    - name: 301-start rpcbind
+      service:
+        name: rpcbind
+        enabled: yes
+        state: started
+    - name: 302-create mount directory
+      file:
+        name: "{{ m_dir }}"
+        state: directory
+    - name: 302-mount
+      mount:
+        src: "{{ r_nfs }}:/data/data0/"
+        path: "{{ m_dir }}"
+        state: mounted

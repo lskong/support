@@ -1,0 +1,6 @@
+- name: modify backup dir owner
+  file:
+    dest: "{{ backdir }}"
+    owner: rsync
+    group: rsync
+    recurse: yes

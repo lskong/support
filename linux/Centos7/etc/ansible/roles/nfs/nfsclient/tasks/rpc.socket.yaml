@@ -1,0 +1,4 @@
+- name: copy rpcbind_socket_moditfy.sh
+  copy: src=rpcbind_socket_moditfy.sh dest=/server/scripts/
+- name: run rpcbind.socket scripts
+  shell: sh /server/scripts/rpcbind_socket_moditfy.sh

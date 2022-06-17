@@ -1,0 +1,15 @@
+- hosts: zabbix
+  gather_facts: no
+  roles:
+    - sendhosts
+    - basic
+
+- hosts: zabbixserver
+  gather_facts: no
+  roles:
+    - zabbixserver
+
+- hosts: zabbixclient
+  gather_facts: no
+  roles:
+    - zabbixclient

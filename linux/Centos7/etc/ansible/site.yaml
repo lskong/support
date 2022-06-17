@@ -1,0 +1,4 @@
+- hosts: 172.16.1.251
+  gather_facts: no
+  roles:
+    - role: basic

@@ -1,0 +1,12 @@
+- name: copy conf && passwd file
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  notify: restart rsyncd server
+  tags: e1
+  with_items:
+    - { src: 'rsyncd.conf', dest: '/etc', mode: '644' }
+    - { src: 'rsync.password', dest: '/etc', mode: '600' }
+    - { src: 'rsync.backup.sh', dest: "{{ scridir }}", mode: '755' }
+    - { src: 'rsync.backup.check.sh', dest: "{{ scridir }}", mode: '755' }

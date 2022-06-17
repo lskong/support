@@ -1,0 +1,144 @@
+#==========================================================                   			   
+# Ansible Playbooks
+#----------------------------------------------------------
+# The Playbooks is CentOS7 service deploy of rsync  
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Auther:       Rockchou			   
+# Time:         2020-04-14 08:50  
+# QQ:           48009202
+# Email:        rockchou@foxmail.com	   
+# Version:      1.0					   
+#----------------------------------------------------------
+# Update:							   
+# Auther:							   
+# Version:
+# Modfiy module：						   
+#----------------------------------------------------------							   
+# Update:							   
+# Auther:							   
+# Version:
+# Modfiy module：
+# 			
+#==========================================================
+
+
+#==========================================================
+# About the host module of Playbooks
+#----------------------------------------------------------
+# 
+# [rysnc]
+#   [rysnc_server]
+#   [rysnc_client]
+# 
+#==========================================================
+
+
+# [rysnc]
+- hosts: rsync
+  remote_user: root
+  tasks:
+    - name: 101-install rsync
+      yum:
+        name: rsync
+        state: installed
+    - name: 102-modify hostname
+      raw: "echo {{ hostname|quote }} >/etc/hostname"
+    - name: 103-exec hostname
+      shell: hostname {{ hostname|quote }} 
+    - name: 104-create scripts directory
+      file:
+       dest: /server/scripts
+       state: directory
+    - name: 105-create backup directory
+      file:
+       dest: /backup/conf
+       state: directory
+
+# [rysnc_server]
+- hosts: rsync_server
+  vars:
+    a_path: /server/ansible
+    s_path: /server/scripts
+  remote_user: root
+  tasks:
+    - name: 201-add user
+      user:
+        name: rsync
+        create_home: no
+        shell: /sbin/nologin
+    - name: 202-push rsync.conf
+      copy:
+        src: "{{ a_path }}/conf/rsyncd.conf"
+        dest: /etc/    
+    - name: 203-push rsync.password
+      copy:
+        src: "{{ a_path }}/conf/rsyncd.password"
+        dest: /etc/rsync.password
+        mode: '600'     
+    - name: 204-modify directory owner
+      file:
+        dest: /backup
+        owner: rsync
+        group: rsync
+        recurse: yes
+    - name: 205-start rsync
+      service:
+        name: rsyncd
+        enabled: yes
+        state: started    
+    - name: 206-push rysnc cron script
+      copy:
+        src: "{{ a_path }}/scripts/rsyncd_backup.sh"
+        dest: "{{ s_path }}/rsync_backup.sh"
+        mode: u+x
+    - name: 207-set cron rsync
+      cron:
+        name: rsync_backup
+        minute: '00'
+        hour: '00'
+        job: '/bin/sh /server/scripts/rsync_backup.sh >/dev/null 2>&1'
+    - name: 208-push backup_check_mail_script
+      copy:
+        src: "{{ a_path }}/scripts/backup_check_mail.sh"
+        dest: "{{ s_path }}/backup_check_mail.sh"
+        mode: '755'
+    - name: 209-cron_backup_check_mail
+      cron:
+        name: backup_check_mail
+        minute: '00'
+        hour: '04'
+        job: '/bin/sh /server/scripts/backup_check_mail.sh >/dev/null 2>&1'
+    - name: 210-postfix service conf modify
+      lineinfile:
+        path: /etc/postfix/main.cf
+        regexp: '^inet_interfaces ='
+        line: 'inet_interfaces = all'
+    - name: 211-start postfix service
+      service:
+        name: postfix
+        state: started
+        enabled: yes
+
+# [rysnc_client]
+- hosts: all
+  vars:
+    a_path: /server/ansible
+    s_path: /server/scripts
+  remote_user: root
+  tasks:
+    - name: 301-push rsync.password
+      copy:
+        src: "{{ a_path }}/conf/rsync.password"
+        dest: /etc/
+        mode: '600'
+    - name: 302-push rysnc cron script
+      copy:
+        src: "{{ a_path }}/scripts/rsync_backup.sh"
+        dest: "{{ s_path }}"
+        mode: '755'    
+    - name: 303-set cron rsync
+      cron:
+        name: rsync_backup
+        minute: '00'
+        hour: '00'
+        job: '/bin/sh /server/scripts/rsync_backup.sh >/dev/null 2>&1'

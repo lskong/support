@@ -1,0 +1,6 @@
+#appldir: /app
+#tooldir: /app/tools
+#scridir: /server/scripts
+#backdir: /backup
+#datadir: /data
+ports: 873

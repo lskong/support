@@ -1,0 +1,10 @@
+- name: create_directory
+  file:
+    dest: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ appldir }}"
+    - "{{ scridir }}"
+    - "{{ tooldir }}"
+    - "{{ backdir }}"
+    

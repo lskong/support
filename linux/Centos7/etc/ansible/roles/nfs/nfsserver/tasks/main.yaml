@@ -1,0 +1,5 @@
+- include_tasks: yum.yaml
+- include_tasks: copy.yaml
+- include_tasks: file.yaml
+- include_tasks: service.yaml
+- include_tasks: shell.yaml

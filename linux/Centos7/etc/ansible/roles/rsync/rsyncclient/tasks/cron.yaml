@@ -1,0 +1,8 @@
+- name: cron backup conf
+  cron:
+    name: "{{ item.name }}"
+    minute: "{{ item.minute }}"
+    hour: "{{ item.hour }}"
+    job: "{{ item.job }}"
+  with_items:
+    - { name: 'rsync_backup', minute: '00', hour: '00', job: '/bin/sh /server/scripts/rsync.backup.sh >/dev/null 2>&1' }

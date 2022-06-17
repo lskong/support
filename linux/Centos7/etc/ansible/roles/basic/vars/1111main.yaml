@@ -1,0 +1,5 @@
+appldir: /app
+tooldir: /server/tools
+scridir: /server/scripts
+backdir: /backup
+datadir: /data

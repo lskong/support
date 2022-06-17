@@ -1,0 +1,4 @@
+dbname: zabbix
+dbuser: zabbix
+dbpass: zabbix
+max_conn: '1000'

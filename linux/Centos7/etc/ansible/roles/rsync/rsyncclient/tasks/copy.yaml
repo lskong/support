@@ -1,0 +1,9 @@
+- name: copy conf && passwd file
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  tags: e2
+  with_items:
+    - { src: 'rsync.password', dest: '/etc', mode: '600' }
+    - { src: 'rsync.backup.sh', dest: "{{ scridir }}", mode: '755' }

@@ -1,0 +1,6 @@
+- name: check nfs service start
+  shell: df -h|grep 172.16.1.3
+  register: check_mount
+- name: display nfs check
+  debug:
+    msg: "{{ check_mount }}"
