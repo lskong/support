@@ -1,0 +1,43 @@
+version: '2.1'
+services:
+  yapi:
+    image: mrjin/yapi:latest
+    # build: ./
+    container_name: yapi
+    environment:
+      - VERSION=1.5.6
+      - LOG_PATH=/tmp/yapi.log
+      - HOME=/home
+      - PORT=3000
+      - ADMIN_EMAIL=admin@vaddsoft.com
+      - DB_SERVER=mongo
+      - DB_NAME=yapi
+      - DB_PORT=27017
+    # restart: always
+    ports:
+      - 3000:3000
+    volumes:
+      - /data/yapi/log/yapi.log:/home/vendors/log # log dir
+    depends_on:
+      - mongo
+    entrypoint: "bash /wait-for-it.sh mongo:27017 -- entrypoint.sh"
+    networks:
+      - back-net
+  mongo:
+    image: mongo
+    container_name: mongo
+    # restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - /data/yapi/mongodb:/data/db #db dir
+    networks:
+      - back-net
+networks:
+  back-net:
+    external: true
+
+# 默认密码是：ymfe.org，安装成功后进入后台修改
+# 获取镜像：docker pull mrjin/yapi:latest
+# nginx配置创建network：docker network create back-net
+# 启动：docker-compose up -d

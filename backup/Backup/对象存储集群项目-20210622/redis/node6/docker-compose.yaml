@@ -1,0 +1,28 @@
+version: '3.8'
+networks:
+  macvlan10:
+    external:
+      name: macvlan10
+services:
+  redis-6385:
+    image: redis
+    container_name: redis-6385
+    restart: always
+    volumes:
+      - /data/redis/cluster/6385/conf/:/usr/local/etc/redis/
+      - /data/redis/cluster/6385/data:/data
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      macvlan10:
+        ipv4_address: 10.0.0.125
+  redis-6386:
+    image: redis
+    container_name: redis-6386
+    restart: always
+    volumes:
+      - /data/redis/cluster/6386/conf/:/usr/local/etc/redis
+      - /data/redis/cluster/6386/data:/data
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      macvlan10:
+        ipv4_address: 10.0.0.126

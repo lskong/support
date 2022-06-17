@@ -1,0 +1,32 @@
+{
+    "CN": "kubernetes",
+    "hosts": [
+        "10.0.0.1",
+        "127.0.0.1",
+        "kubernetes",
+        "kubernetes.default",
+        "kubernetes.default.svc",
+        "kubernetes.default.svc.cluster",
+        "kubernetes.default.svc.cluster.local",
+        "172.16.103.110",
+        "172.16.103.111",
+        "172.16.103.112",
+        "172.16.103.113",
+        "172.16.103.114",
+        "172.16.103.115",
+        "172.16.103.116"
+    ],
+    "key": {
+        "algo": "rsa",
+        "size": 2048
+    },
+    "names": [
+        {
+            "C": "CN",
+            "L": "Shanghai",
+            "ST": "Shanghai",
+            "O" : "kubernetes",
+            "OU": "System"
+        }
+    ]
+}

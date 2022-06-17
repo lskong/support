@@ -1,0 +1,6 @@
+alter database recover managed standby database cancel;
+alter database recover managed standby database finish force;
+alter database commit to switchover to primary with session shutdown;
+alter database open;
+select database_role,protection_mode,protection_level,open_mode from v$database;
+exit;

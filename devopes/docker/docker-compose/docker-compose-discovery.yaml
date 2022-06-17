@@ -1,0 +1,15 @@
+version: '3.7'
+services:
+  side:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: discovery
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+        - 8443:83443
+        - 19200:19200
+    volumes:
+      - /home/data/:/var/syncthing
+    tty: true

@@ -1,0 +1,12 @@
+---
+- hosts: all
+  vars:
+    run_redis_bench: no
+    install_redis: yes
+    ansible_python_interpreter: /usr/bin/python
+  remote_user: centos
+  become: true
+  any_errors_fatal: true
+  environment:
+  roles:
+    - role: redis-benchmark

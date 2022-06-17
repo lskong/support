@@ -1,0 +1,37 @@
+---
+- name: Test memtier_benchmark existing
+  shell: command -v /usr/local/bin/memtier_benchmark
+  register: memtier_exist
+  ignore_errors: yes
+
+- name: install prerequisites
+  package:
+    name: git,autoconf,automake,make,gcc-c++,pcre-devel,zlib-devel,libmemcached-devel,libevent-devel,openssl-devel
+    state: present
+  when: memtier_exist.rc == 1
+
+- name: clone source code
+  git:
+    repo: "{{ memtier_url }}"
+    dest: /root/memtier
+  when: memtier_exist.rc == 1
+
+- name: Build memtier-benchmark
+  shell: |
+    cd /root/memtier
+    autoreconf -ivf
+    ./configure --disable-tls
+    make
+    make install
+  when: memtier_exist.rc == 1
+
+- name: test installation
+  shell: |
+    # sh /home/centos/run_memtier.sh > memtier.txt
+    /usr/local/bin/memtier_benchmark > memtier.txt
+  when: run_memtier
+
+- name: collect stats
+  fetch:
+    src: memtier.txt
+    dest: stats

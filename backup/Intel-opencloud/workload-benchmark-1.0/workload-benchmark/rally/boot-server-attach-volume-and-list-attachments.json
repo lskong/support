@@ -1,0 +1,51 @@
+{% set flavor_name = flavor_name or "m1.small" %}
+{% set runner_times = runner_times or "200" %}
+{
+    "NovaServers.boot_server_attach_volume_and_list_attachments": [
+        {
+            "args": {
+                "flavor": {
+                    "name": "{{flavor_name}}"
+                },
+                "image": {
+                    "name": "CentOS"
+                },
+                "volume_size": 5,
+                "volume_num": 1,
+                "boot_server_kwargs": {},
+                "create_volume_kwargs": {}
+            },
+            "runner": {
+                "type": "constant",
+                "times": {{runner_times}},
+                "concurrency":100
+            },
+            "context": {
+                "users": {
+                    "tenants": 10,
+                    "users_per_tenant": 2
+                },
+                "quotas": {
+                    "neutron": {
+                        "network": -1,
+                        "subnet": -1
+                    },
+                    "nova": {
+                        "instances": 100000,
+                        "ram": -1,
+                        "cores": -1
+                    },
+                    "cinder": {
+                        "volumes": 100000
+                    }
+                }
+            },
+            "sla": {
+                "failure_rate": {
+                    "max": 0
+                }
+            }
+        }
+    ]
+}
+

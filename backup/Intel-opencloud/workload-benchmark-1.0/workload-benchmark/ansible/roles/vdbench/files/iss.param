@@ -1,0 +1,71 @@
+* Contents of parameter file: /home/centos/vdbench/iss.param
+
+*
+* VDBench sample definition
+*
+* HD:      Host Definition
+* SD:      Storage Definition
+* WD:      Workload Definition
+* RD:      Run Definition
+*
+
+hd=default,vdbench=/root/vdbench,user=root,shell=vdbench,jvms=8
+** Remember to update the IP addresses **
+hd=hd1,system=10.0.0.30
+hd=hd2,system=10.0.0.20
+hd=hd3,system=10.0.0.10
+hd=hd4,system=10.0.0.23
+hd=hd5,system=10.0.0.49
+hd=hd6,system=10.0.0.22
+hd=hd7,system=10.0.0.18
+hd=hd8,system=10.0.0.39
+hd=hd9,system=10.0.0.9
+hd=hd10,system=10.0.0.26
+hd=hd11,system=10.0.0.13
+hd=hd12,system=10.0.0.19
+hd=hd13,system=10.0.0.17
+hd=hd14,system=10.0.0.34
+hd=hd15,system=10.0.0.37
+hd=hd16,system=10.0.0.41
+hd=hd17,system=10.0.0.29
+hd=hd18,system=10.0.0.14
+hd=hd19,system=10.0.0.6
+hd=hd20,system=10.0.0.16
+hd=hd21,system=10.0.0.25
+hd=hd22,system=10.0.0.40
+hd=hd23,system=10.0.0.28
+hd=hd24,system=10.0.0.7
+hd=hd25,system=10.0.0.3
+hd=hd26,system=10.0.0.5
+hd=hd27,system=10.0.0.8
+hd=hd28,system=10.0.0.4
+hd=hd29,system=10.0.0.15
+hd=hd30,system=10.0.0.12
+
+** Each VM is attached with 2 volume: vdb and vdc **
+sd=sd1,host=hd*,lun=/dev/vdb,openflags=o_direct
+sd=sd2,host=hd*,lun=/dev/vdc,openflags=o_direct
+
+wd=wdpre,sd=sd*,xfersize=(128k,100),rdpct=70,seekpct=100,streams=16
+wd=wd4k7r,sd=sd*,xfersize=(4k,100),rdpct=70,seekpct=100,streams=16
+wd=wd4k10r,sd=sd*,xfersize=(4k,100),rdpct=100,seekpct=100,streams=16
+wd=wd4k10w,sd=sd*,xfersize=(4k,100),rdpct=0,seekpct=100,streams=16
+wd=wd8k7r,sd=sd*,xfersize=(8k,100),rdpct=70,seekpct=100,streams=16
+wd=wd8k10r,sd=sd*,xfersize=(8k,100),rdpct=100,seekpct=100,streams=16
+wd=wd8k10w,sd=sd*,xfersize=(8k,100),rdpct=0,seekpct=100,streams=16
+wd=wd128k7r,sd=sd*,xfersize=(128k,100),rdpct=70,seekpct=100,streams=16
+wd=wd128k10r,sd=sd*,xfersize=(128k,100),rdpct=100,seekpct=100,streams=16
+wd=wd128k10w,sd=sd*,xfersize=(128k,100),rdpct=0,seekpct=100,streams=16
+
+rd=runpre,wd=wdpre,iorate=max,elapsed=30,interval=1,warmup=5,threads=512
+rd=run4k10r,wd=wd4k10r,iorate=max,elapsed=300,interval=1,warmup=5,threads=512
+rd=run4k7r,wd=wd4k7r,iorate=max,elapsed=300,interval=1,warmup=5,threads=512
+rd=run4k10w,wd=wd4k10w,iorate=max,elapsed=300,interval=1,warmup=5,threads=512
+
+rd=run8k10r,wd=wd8k10r,iorate=max,elapsed=300,interval=1,warmup=5,threads=512
+rd=run8k7r,wd=wd8k7r,iorate=max,elapsed=300,interval=1,warmup=5,threads=512
+rd=run8k10w,wd=wd8k10w,iorate=max,elapsed=300,interval=1,warmup=5,threads=512
+
+rd=run128k10r,wd=wd128k10r,iorate=max,elapsed=300,interval=1,warmup=5,threads=512
+rd=run128k7r,wd=wd128k7r,iorate=max,elapsed=300,interval=1,warmup=5,threads=512
+rd=run128k10w,wd=wd128k10w,iorate=max,elapsed=300,interval=1,warmup=5,threads=512

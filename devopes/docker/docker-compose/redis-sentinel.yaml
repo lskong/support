@@ -1,0 +1,143 @@
+version: '3.4'
+services:
+  master:
+    image: redis
+#    container_name: redis-master
+#    restart: always
+    command: redis-server /etc/redis/redis.conf
+    volumes:
+      - /data/redis/data:/data
+      - /data/redis/conf/redis-master.conf:/etc/redis/redis.conf:ro
+      - /data/redis/logs:/var/log/redis
+    ports:
+    - target: 6379
+      published: 6379
+      protocol: tcp
+      mode: host
+    deploy:
+      placement:
+        constraints: [node.labels.role==master]
+    networks:
+      - swarm-net
+
+  slave1:
+    image: redis
+#    container_name: redis-slave-1
+#    restart: always
+    command: redis-server /etc/redis/redis.conf
+    volumes:
+      - /data/redis/data:/data
+      - /data/redis/conf/redis-slave-1.conf:/etc/redis/redis.conf:ro
+      - /data/redis/logs:/var/log/redis
+    depends_on:
+      - master
+    ports:
+    - target: 6379
+      published: 6379
+      protocol: tcp
+      mode: host
+    deploy:
+      placement:
+        constraints: [node.labels.role==slave1]
+    networks:
+      - swarm-net
+
+  slave2:
+    image: redis
+#    container_name: redis-slave-2
+#    restart: always
+    command: redis-server /etc/redis/redis.conf
+    volumes:
+      - /data/redis/data:/data
+      - /data/redis/conf/redis-slave-2.conf:/etc/redis/redis.conf:ro
+      - /data/redis/logs:/var/log/redis
+    depends_on:
+      - master
+    ports:
+    - target: 6379
+      published: 6379
+      protocol: tcp
+      mode: host
+    deploy:
+      placement:
+        constraints: [node.labels.role==slave2]
+    networks:
+      - swarm-net
+
+  sentinel1:
+    image: redis
+#    container_name: redis-sentinel-1
+    command: redis-sentinel /usr/local/etc/redis/sentinel.conf
+#    restart: always
+    depends_on:
+      - master
+      - slave1
+      - slave2
+    ports:
+    - target: 26379
+      published: 26379
+      protocol: tcp
+      mode: host
+    deploy:
+      placement:
+        constraints: [node.labels.role==master]
+    networks:
+      - swarm-net
+    volumes:
+      - /data/redis/conf/sentinel1.conf:/usr/local/etc/redis/sentinel.conf
+
+  sentinel2:
+    image: redis
+#    container_name: redis-sentinel-2
+    command: redis-sentinel /usr/local/etc/redis/sentinel.conf
+#    restart: always
+    depends_on:
+      - master
+      - slave1
+      - slave2
+    ports:
+    - target: 26379
+      published: 26379
+      protocol: tcp
+      mode: host
+    deploy:
+      placement:
+        constraints: [node.labels.role==slave1]
+    networks:
+      - swarm-net
+    volumes:
+      - /data/redis/conf/sentinel2.conf:/usr/local/etc/redis/sentinel.conf
+
+  sentinel3:
+    image: redis
+#    container_name: redis-sentinel-3
+    command: redis-sentinel /usr/local/etc/redis/sentinel.conf
+#    restart: always
+    depends_on:
+      - master
+      - slave1
+      - slave2
+    ports:
+    - target: 26379
+      published: 26379
+      protocol: tcp
+      mode: host
+    deploy:
+      placement:
+        constraints: [node.labels.role==slave2]
+    networks:
+      - swarm-net
+    volumes:
+      - /data/redis/conf/sentinel3.conf:/usr/local/etc/redis/sentinel.conf
+
+networks:
+  swarm-net:
+    external:
+      name: swarm-net
+
+
+# docker node update --label-add role=master node4
+# docker node update --label-add role=slave1 node5
+# docker node update --label-add role=slave2 node6
+
+

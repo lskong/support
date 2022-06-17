@@ -1,0 +1,3 @@
+alter database recover managed standby database using current logfile disconnect from session;
+select database_role,protection_mode,protection_level,open_mode from v$database;
+exit;

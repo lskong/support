@@ -1,0 +1,21 @@
+---
+- name: install java
+  package:
+    name: java
+    state: present
+- name: install unzip
+  package:
+    name: unzip
+    state: present
+- name: mkdir
+  command: mkdir -p /home/centos/vdbench
+- name: install vdbench
+  unarchive:
+    src: vdbench50407.zip
+    dest: /home/centos/vdbench/
+- name: create config file
+  copy:
+    src: iss.param
+    dest: /home/centos/vdbench/
+- name: start vdbench rsh
+  shell: nohup /home/centos/vdbench/vdbench rsh </dev/null >/dev/null 2>&1 &

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workload name="create-bucket" description="create s3 bucket" config="">
+    <auth type="none" config=""/>	
+    <workflow config="">
+
+        <!--创建bucket  -->
+        <workstage name="create bucket" closuredelay="0" config="">
+            <auth type="none" config=""/> 	
+            <work name="rgw1-create" type="init" workers="64" interval="5"
+                division="container" runtime="0" rampup="0" rampdown="0"
+                afr="0" totalOps="1" totalBytes="0" driver="driver1" config="containers=r(1,100)">
+                <auth type="none" config=""/>
+                <storage type="s3" config="accesskey=SXTUKNM2MCBBQB4Q0BZW;secretkey=5cbxDBmvNgOBk9VG5Bs5iw5Q9BrSFNGXKOp9xVV9;endpoint=http://10.0.0.24:7479;path_style_access=true"/>
+                <operation type="init" ratio="100" division="container"
+                    config="containers=r(1,100);objects=r(0,0);sizes=c(0)B" id="none"/>
+            </work>
+        </workstage>
+ 
+        <!--初始化数据，顺序写入对象格式 -->
+        <workstage name="initobject" closuredelay="0" config="">
+            <auth type="none" config=""/> 	
+            <work name="rgw1-put" type="normal" workers="64" interval="5"
+                division="container" runtime="600" rampup="0" rampdown="0"
+                afr="20000" totalOps="0" totalBytes="0" driver="driver1" config="">
+                <auth type="none" config=""/>
+                <storage type="s3" config="accesskey=SXTUKNM2MCBBQB4Q0BZW;secretkey=5cbxDBmvNgOBk9VG5Bs5iw5Q9BrSFNGXKOp9xVV9;endpoint=http://10.0.0.24:7479;path_style_access=true"/>
+                <operation type="write" ratio="100" division="container"
+                    config="containers=r(1,100);objects=r(1,2000);sizes=c(4)KB" id="none"/>
+            </work>  	
+        </workstage>
+ 
+        <!--测试随机写入 -->
+        <workstage name="putobject" closuredelay="0" config="">
+            <auth type="none" config=""/> 	
+            <work name="rgw1-put" type="normal" workers="64" interval="5"
+                division="container" runtime="600" rampup="0" rampdown="0"
+                afr="20000" totalOps="0" totalBytes="0" driver="driver1" config="">
+                <auth type="none" config=""/>
+                <storage type="s3" config="accesskey=SXTUKNM2MCBBQB4Q0BZW;secretkey=5cbxDBmvNgOBk9VG5Bs5iw5Q9BrSFNGXKOp9xVV9;endpoint=http://10.0.0.24:7479;path_style_access=true"/>
+                <operation type="write" ratio="100" division="container"
+                    config="containers=u(1,100);objects=u(1,2000);sizes=c(4)KB" id="none"/>
+            </work>	
+        </workstage>
+ 
+        <!--测试随机读 -->
+        <workstage name="getobj" closuredelay="0" config="">
+            <auth type="none" config=""/>
+            <work name="rgw1-get" type="normal" workers="64" interval="5"
+                division="none" runtime="600" rampup="0" rampdown="0"
+                afr="200000" totalOps="0" totalBytes="0" driver="driver1" config="">
+                <auth type="none" config=""/>
+                <storage type="s3" config="accesskey=SXTUKNM2MCBBQB4Q0BZW;secretkey=5cbxDBmvNgOBk9VG5Bs5iw5Q9BrSFNGXKOp9xVV9;endpoint=http://10.0.0.24:7479;path_style_access=true"/>
+                <operation type="read" ratio="100" division="none"
+                    config="containers=u(1,100);objects=u(1,2000);" id="none"/>
+            </work>
+        </workstage>
+
+        <!--清理对象 -->
+        <workstage name="cleanup" closuredelay="0" config="">
+            <auth type="none" config=""/>
+            <work name="rgw1-cleanup" type="cleanup" workers="64" interval="5"
+                division="object" runtime="0" rampup="0" rampdown="0"
+                afr="0" totalOps="1" totalBytes="0" driver="driver1" config="containers=r(1,100);objects=r(1,2000);">
+                <auth type="none" config=""/>
+                <storage type="s3" config="accesskey=SXTUKNM2MCBBQB4Q0BZW;secretkey=5cbxDBmvNgOBk9VG5Bs5iw5Q9BrSFNGXKOp9xVV9;endpoint=http://10.0.0.24:7479;path_style_access=true"/>
+                <operation type="cleanup" ratio="100" division="object"
+                    config="containers=r(1,100);objects=r(1,2000);;deleteContainer=false;" id="none"/>
+            </work>
+        </workstage>
+
+        <!--删除bucket -->
+        <workstage name="dispose" closuredelay="0" config="">
+            <auth type="none" config=""/>
+            <work name="rgw1-dispose" type="dispose" workers="64" interval="5"
+                division="container" runtime="0" rampup="0" rampdown="0"
+                afr="0" totalOps="1" totalBytes="0" driver="driver1" config="containers=r(1,100);">
+                <auth type="none" config=""/>
+                <storage type="s3" config="accesskey=SXTUKNM2MCBBQB4Q0BZW;secretkey=5cbxDBmvNgOBk9VG5Bs5iw5Q9BrSFNGXKOp9xVV9;endpoint=http://10.0.0.24:7479;path_style_access=true"/>
+                <operation type="dispose" ratio="100"
+                    division="container"
+                    config="containers=r(1,100);;objects=r(0,0);sizes=c(0)B;;" id="none"/>
+            </work>
+        </workstage>
+ 
+    </workflow>
+</workload>

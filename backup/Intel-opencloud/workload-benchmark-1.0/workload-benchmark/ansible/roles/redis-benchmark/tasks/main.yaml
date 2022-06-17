@@ -1,0 +1,53 @@
+---
+- name: install redis server
+  apt:
+    name: redis-server
+    update_cache: yes
+  when: ansible_distribution == "Ubuntu" and ( install_redis )
+
+- name: Add epel repository
+  yum_repository:
+    name: epel
+    description: EPEL YUM repo
+    baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+    gpgcheck: no
+  when: ansible_distribution == "CentOS" and ( install_redis )
+
+- name: install redis server
+  package:
+    name: redis
+    state: present
+  when: ansible_distribution == "CentOS" and ( install_redis )
+
+- name: make redis listen to all interfaces
+  lineinfile:
+    path: /etc/redis.conf
+    regexp: '^bind 127.0.0.1'
+    line: '# bind 127.0.0.1'
+  when: install_redis
+
+- name: disable redis protect mode
+  lineinfile:
+    path: /etc/redis.conf
+    regexp: '^protected-mode'
+    line: 'protected-mode no'
+  when: install_redis
+
+- name: start redis service
+  service:
+    name: redis
+    state: restarted
+
+- name: run redis benchmark in loop mode and terminate the process after 300s
+  shell:
+    timeout -k 302 300 redis-benchmark -P 100 -n 6000000 -d 1024 -r 8000000 -t set,get -l > redis.txt
+  register: benchmark
+  failed_when: benchmark.rc not in [0, 124]
+  when: run_redis_bench
+
+- name: collect stats
+  fetch:
+    src: redis.txt
+    dest: stats
+  when: run_redis_bench
+  tags: get

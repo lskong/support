@@ -1,0 +1,141 @@
+version: '3.8'
+services:
+  redis-6381:
+    image: redis
+    command: redis-server /etc/redis/redis.conf
+    volumes:
+      - /data/redis/cluster/6381/data:/data
+      - /data/redis/cluster/6381/conf/redis.conf:/etc/redis/redis.conf
+      - /data/redis/cluster/6381/logs:/var/log/redis
+    ports:
+    - target: 6381
+      published: 6381
+      protocol: tcp
+      mode: host
+    - target: 16381
+      published: 16381
+      protocol: tcp
+      mode: host
+    deploy:
+      placement:
+        constraints: [node.labels.role==master]
+    networks:
+      - swarm-net
+
+  redis-6382:
+    image: redis
+    command: redis-server /etc/redis/redis.conf
+    volumes:
+      - /data/redis/cluster/6382/data:/data
+      - /data/redis/cluster/6382/conf/redis.conf:/etc/redis/redis.conf
+      - /data/redis/cluster/6382/logs:/var/log/redis
+    ports:
+    - target: 6382
+      published: 6382
+      protocol: tcp
+      mode: host
+    - target: 16382
+      published: 16382
+      protocol: tcp
+      mode: host
+    deploy:
+      placement:
+        constraints: [node.labels.role==master]
+    networks:
+      - swarm-net
+
+  redis-6383:
+    image: redis
+    command: redis-server /etc/redis/redis.conf
+    volumes:
+      - /data/redis/cluster/6383/data:/data
+      - /data/redis/cluster/6383/conf/redis.conf:/etc/redis/redis.conf
+      - /data/redis/cluster/6383/logs:/var/log/redis
+    ports:
+    - target: 6383
+      published: 6383
+      protocol: tcp
+      mode: host
+    - target: 16383
+      published: 16383
+      protocol: tcp
+      mode: host
+    deploy:
+      placement:
+        constraints: [node.labels.role==slave1]
+    networks:
+      - swarm-net
+
+  redis-6384:
+    image: redis
+    command: redis-server /etc/redis/redis.conf
+    volumes:
+      - /data/redis/cluster/6384/data:/data
+      - /data/redis/cluster/6384/conf/redis.conf:/etc/redis/redis.conf
+      - /data/redis/cluster/6384/logs:/var/log/redis
+    ports:
+    - target: 6384
+      published: 6384
+      protocol: tcp
+      mode: host
+    - target: 16384
+      published: 16384
+      protocol: tcp
+      mode: host
+    deploy:
+      placement:
+        constraints: [node.labels.role==slave1]
+    networks:
+      - swarm-net
+
+  redis-6385:
+    image: redis
+    command: redis-server /etc/redis/redis.conf
+    volumes:
+      - /data/redis/cluster/6385/data:/data
+      - /data/redis/cluster/6385/conf/redis.conf:/etc/redis/redis.conf
+      - /data/redis/cluster/6385/logs:/var/log/redis
+    ports:
+    - target: 6385
+      published: 6385
+      protocol: tcp
+      mode: host
+    - target: 16385
+      published: 16385
+      protocol: tcp
+      mode: host
+    deploy:
+      placement:
+        constraints: [node.labels.role==slave2]
+    networks:
+      - swarm-net
+
+  redis-6386:
+    image: redis
+    command: redis-server /etc/redis/redis.conf
+    volumes:
+      - /data/redis/cluster/6386/data:/data
+      - /data/redis/cluster/6386/conf/redis.conf:/etc/redis/redis.conf
+      - /data/redis/cluster/6386/logs:/var/log/redis
+    ports:
+    - target: 6386
+      published: 6386
+      protocol: tcp
+      mode: host
+    - target: 16386
+      published: 16386
+      protocol: tcp
+      mode: host
+    deploy:
+      placement:
+        constraints: [node.labels.role==slave2]
+    networks:
+      - swarm-net
+
+networks:
+  swarm-net:
+    external:
+      name: swarm-net
+
+      
+# docker stack deploy -c redis-cluster.yaml redis --resolve-image=never --with-registry-auth

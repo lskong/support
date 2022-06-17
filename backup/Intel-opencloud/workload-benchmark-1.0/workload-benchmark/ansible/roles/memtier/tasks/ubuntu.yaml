@@ -1,0 +1,38 @@
+---
+- name: install redis server
+  apt:
+    name: memtier-benchmark
+    update_cache: yes
+  when: ansible_distribution == "Ubuntu"
+
+- name: Add epel repository
+  yum_repository:
+    name: epel
+    description: EPEL YUM repo
+    baseurl: https://download.fedoraproject.org/pub/epel/$releasever/$basearch/
+    gpgcheck: no
+  when: ansible_distribution == "CentOS"
+
+- name: install redis server
+  package:
+    name: redis
+    state: present
+  when: ansible_distribution == "CentOS"
+
+- name: start redis service
+  service:
+    name: redis
+    state: started
+
+- name: run redis benchmark in loop mode and terminate the process after 300s
+  shell:
+    timeout -k 302 300 redis-benchmark -P 100 -n 6000000 -d 1024 -r 8000000 -t set,get -l -q > redis.txt
+  register: benchmark
+  failed_when: benchmark.rc not in [0, 124]
+  when: run_redis_bench
+
+- name: collect stats
+  fetch:
+    src: redis.txt
+    dest: stats
+  when: run_redis_bench

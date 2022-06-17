@@ -1,0 +1,188 @@
+version: '3.7'
+services:
+  dsm-init-8380:
+    image: ndr/dsm-agent-init:v1.14
+    container_name: dsm-init-8380
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+        - 8380:8384
+        - 22000:22000
+    deploy:
+      resources:
+        limits:
+         cpus: '2'
+         memory: 2G
+    volumes:
+      - /home/ubuntu/dsm-conf/dsm-agent-8380:/var/dsm-agent
+      - /ndrdata:/ndrdata
+    tty: true
+    networks:
+      - dsm
+
+
+  dsm-init-8381:
+    image: ndr/dsm-agent-init:v1.14
+    container_name: dsm-init-8381
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+        - 8381:8384
+        - 22001:22000
+    deploy:
+      resources:
+        limits:
+         cpus: '2'
+         memory: 2G
+    volumes:
+      - /home/ubuntu/dsm-conf/dsm-agent-8381:/var/dsm-agent
+      - /ndrdata:/ndrdata
+    tty: true
+
+  dsm-init-8382:
+    image: ndr/dsm-agent-init:v1.14
+    container_name: dsm-init-8382
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+        - 8382:8384
+        - 22002:22000
+    deploy:
+      resources:
+        limits:
+         cpus: '2'
+         memory: 2G
+    volumes:
+      - /home/ubuntu/dsm-conf/dsm-agent-8382:/var/dsm-agent
+      - /ndrdata:/ndrdata
+    tty: true
+
+  dsm-init-8383:
+    image: ndr/dsm-agent-init:v1.14
+    container_name: dsm-init-8383
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+        - 8383:8384
+        - 22003:22000
+    deploy:
+      resources:
+        limits:
+         cpus: '2'
+         memory: 2G
+    volumes:
+      - /home/ubuntu/dsm-conf/dsm-agent-8383:/var/dsm-agent
+      - /ndrdata:/ndrdata
+    tty: true
+
+  dsm-init-8384:
+    image: ndr/dsm-agent-init:v1.14
+    container_name: dsm-init-8384
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+        - 8384:8384
+        - 22004:22000
+    deploy:
+      resources:
+        limits:
+         cpus: '2'
+         memory: 2G
+    volumes:
+      - /home/ubuntu/dsm-conf/dsm-agent-8384:/var/dsm-agent
+      - /ndrdata:/ndrdata
+    tty: true
+
+  dsm-init-8385:
+    image: ndr/dsm-agent-init:v1.14
+    container_name: dsm-init-8385
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+        - 8385:8384
+        - 22005:22000
+    deploy:
+      resources:
+        limits:
+         cpus: '2'
+         memory: 2G
+    volumes:
+      - /home/ubuntu/dsm-conf/dsm-agent-8385:/var/dsm-agent
+      - /ndrdata:/ndrdata
+    tty: true
+
+  dsm-init-8386:
+    image: ndr/dsm-agent-init:v1.14
+    container_name: dsm-init-8386
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+        - 8386:8384
+        - 22006:22000
+    deploy:
+      resources:
+        limits:
+         cpus: '2'
+         memory: 2G
+    volumes:
+      - /home/ubuntu/dsm-conf/dsm-agent-8386:/var/dsm-agent
+      - /ndrdata:/ndrdata
+    tty: true
+
+  dsm-init-8387:
+    image: ndr/dsm-agent-init:v1.14
+    container_name: dsm-init-8387
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+        - 8387:8384
+        - 22007:22000
+    deploy:
+      resources:
+        limits:
+         cpus: '2'
+         memory: 2G
+    volumes:
+      - /home/ubuntu/dsm-conf/dsm-agent-8387:/var/dsm-agent
+      - /ndrdata:/ndrdata
+    tty: true
+
+  dsm-init-8388:
+    image: ndr/dsm-agent-init:v1.14
+    container_name: dsm-init-8388
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+        - 8388:8384
+        - 22008:22000
+    deploy:
+      resources:
+        limits:
+         cpus: '2'
+         memory: 2G
+    volumes:
+      - /home/ubuntu/dsm-conf/dsm-agent-8388:/var/dsm-agent
+      - /ndrdata:/ndrdata
+    tty: true
+
+  dsm-init-8389:
+    image: ndr/dsm-agent-init:v1.14
+    container_name: dsm-init-8389
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+        - 8389:8384
+        - 22009:22000
+    deploy:
+      resources:
+        limits:
+         cpus: '2'
+         memory: 2G
+    volumes:
+      - /home/ubuntu/dsm-conf/dsm-agent-8389:/var/dsm-agent
+      - /ndrdata:/ndrdata
+    tty: true
+
+networks:
+  dsm:
+    driver: bridge

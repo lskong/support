@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  redis-${PORT}:
+    image: redis
+    container_name: redis-${PORT}
+    restart: always
+    network_mode: host
+    volumes:
+      - /data/redis/cluster/${PORT}/conf/redis.conf:/usr/local/etc/redis/redis.conf
+      - /data/redis/cluster/${PORT}/data:/data
+    command: redis-server /usr/local/etc/redis/redis.conf

@@ -1,0 +1,10 @@
+FROM centos
+MAINTAINER  vaddsoft
+
+RUN mkdir -p /mnt/test
+
+RUN yum -y install nfs-utils
+
+RUN yum install -y centos-release-gluster
+RUN yum install -y glusterfs-client
+

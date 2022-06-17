@@ -1,0 +1,70 @@
+version: '3'
+services:
+  db:
+    image: harbor.qualstor.com/cloudisk/mariadb:10.5.9
+    container_name: mysql
+    restart: always
+    ports:
+      - 3306:3306
+    volumes:
+      - /cloudisk/mariadb:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=cloudisk
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_USER=cloudisk
+      - MYSQL_PASSWORD=123456
+
+  redis:
+    image: harbor.qualstor.com/cloudisk/redis:6.2.2-alpine
+    container_name: redis
+    restart: always
+    expose:
+      - 6379
+
+  nextcloud:
+    image: harbor.qualstor.com/cloudisk/nextcloud:21.0.1-apache
+    container_name: nextcloud
+    depends_on:
+      - redis
+    environment:
+      - UID=1000
+      - GID=1000
+      - UPLOAD_MAX_SIZE=10G
+      - APC_SHM_SIZE=128M
+      - OPCACHE_MEM_SIZE=128
+      - CRON_PERIOD=15m
+      - TZ=Aisa/Shanghai
+      - DOMAIN=cloudisk.qualstor.com
+      - DB_TYPE=mysql
+      - DB_NAME=cloudisk
+      - DB_USER=cloudisk
+      - DB_PASSWORD=123456
+      - DB_HOST=nextcloud-db
+    volumes:
+       - /cloudisk/nextcloud:/var/www/html
+    expose:
+      - 8080
+    ports: 
+      - 8080:80/tcp
+    restart: always
+
+
+  onlyoffice:
+    image: harbor.qualstor.com/cloudisk/onlyoffice:6.2.2
+    container_name: onlyoffice
+    hostname: onlyoffice
+    environment:
+      - REDIS_SERVER_HOST=redis
+      - REDIS_SERVER_PORT=6379
+    volumes:
+      - /cloudisk/onlyoffice/data:/var/www/onlyoffice/Data
+      - /cloudisk/onlyoffice/logs:/var/log/onlyoffice
+    restart: always
+    expose:
+      - 9000
+      - 9001
+    ports:
+      - 9000:80
+      - 9001:443
+    links:
+      - db

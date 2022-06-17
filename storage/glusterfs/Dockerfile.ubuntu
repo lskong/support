@@ -1,0 +1,7 @@
+FROM ubuntu
+
+RUN sed -i s/archive.ubuntu.com/mirrors.aliyun.com/g /etc/apt/sources.list
+RUN apt-get clean && \
+    apt-get update -y && \
+    apt-get install -y --no-install-recommends glusterfs-client && \
+    rm -rf /var/lib/apt/lists/*

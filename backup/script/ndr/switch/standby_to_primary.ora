@@ -1,0 +1,6 @@
+select switchover_status,database_role from v$database;
+alter database recover managed standby database finish force;
+alter database commit to switchover to primary;
+alter database open;
+select database_role,protection_mode,protection_level,open_mode from v$database;
+exit;

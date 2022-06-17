@@ -1,0 +1,25 @@
+version: "3.8"
+
+networks:
+  macvlan10:
+    external:
+      name: macvlan10
+
+services:
+  haproxy:
+    hostname: haproxy
+    container_name: haproxy
+    restart: always
+    image: haproxy:latest
+    ports:
+      - "8888:8888"
+      - "6379:6379"
+    environment:
+      TZ: Asia/Shanghai
+    volumes:
+      - /data/haproxy/haproxy.cfg:/etc/haproxy/haproxy.cfg
+    command:
+      haproxy -f /etc/haproxy/haproxy.cfg
+    networks:
+      macvlan10:
+        ipv4_address: 10.0.0.99

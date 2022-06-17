@@ -1,0 +1,3 @@
+---
+install_redis: yes
+run_redis_bench: yes

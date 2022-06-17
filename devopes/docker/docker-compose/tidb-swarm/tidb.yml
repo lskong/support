@@ -1,0 +1,259 @@
+version: "3.8"
+services:
+  pd1:
+    hostname: pd1
+    image: pingcap/pd:latest
+    ports:
+      - "12379:2379"
+      - "12380:2380"
+    volumes:
+      - /data/tidb/pd1:/data/pd1
+    networks:
+      swarm-net:
+        aliases:
+          - pd1
+    environment:
+      TZ: Asia/Shanghai
+    command:
+      - --name=pd1
+      - --data-dir=/data/pd1
+      - --client-urls=http://0.0.0.0:2379
+      - --advertise-client-urls=http://pd1:2379
+      - --peer-urls=http://0.0.0.0:2380
+      - --advertise-peer-urls=http://pd1:2380
+      - --initial-cluster=pd1=http://pd1:2380,pd2=http://pd2:2380,pd3=http://pd3:2380
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.labels.role==master]
+
+  pd2:
+    hostname: pd2
+    image: pingcap/pd:latest
+    ports:
+      - "22379:2379"
+      - "22380:2380"
+    volumes:
+      - /data/tidb/pd2:/data/pd2
+    networks:
+      swarm-net:
+        aliases:
+          - pd2
+    environment:
+      TZ: Asia/Shanghai
+    command:
+      - --name=pd2
+      - --data-dir=/data/pd2
+      - --client-urls=http://0.0.0.0:2379
+      - --advertise-client-urls=http://pd2:2379
+      - --peer-urls=http://0.0.0.0:2380
+      - --advertise-peer-urls=http://pd2:2380
+      - --initial-cluster=pd1=http://pd1:2380,pd2=http://pd2:2380,pd3=http://pd3:2380
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.labels.role==slave1]
+
+  pd3:
+    hostname: pd3
+    image: pingcap/pd:latest
+    ports:
+      - "32379:2379"
+      - "32380:2380"
+    volumes:
+      - /data/tidb/pd3:/data/pd3
+    networks:
+      swarm-net:
+        aliases:
+          - pd3
+    environment:
+      TZ: Asia/Shanghai
+    command:
+      - --name=pd3
+      - --data-dir=/data/pd3
+      - --client-urls=http://0.0.0.0:2379
+      - --advertise-client-urls=http://pd3:2379
+      - --peer-urls=http://0.0.0.0:2380
+      - --advertise-peer-urls=http://pd3:2380
+      - --initial-cluster=pd1=http://pd1:2380,pd2=http://pd2:2380,pd3=http://pd3:2380
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.labels.role==slave2]
+
+
+  tikv1:
+    hostname: tikv1
+    image: pingcap/tikv:latest
+    ports:
+      - 20160:20160
+    volumes:
+      - /data/tidb/tikv1:/data/tikv1
+    networks:
+      swarm-net:
+        aliases:
+          - tikv1
+    environment:
+      TZ: Asia/Shanghai
+    command:
+      - --addr=0.0.0.0:20160
+      - --advertise-addr=tikv1:20160
+      - --data-dir=/data/tikv1
+      - --pd=pd1:2379,pd2:2379,pd3:2379
+    depends_on:
+      - pd1
+      - pd2
+      - pd3
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.labels.role==master]
+
+  tikv2:
+    hostname: tikv2      
+    image: pingcap/tikv:latest
+    ports:
+      - 20161:20160
+    volumes:
+      - /data/tidb/tikv2:/data/tikv2
+    networks:
+      swarm-net:
+        aliases:
+          - tikv2
+    environment:
+      TZ: Asia/Shanghai
+    command:
+      - --addr=0.0.0.0:20160
+      - --advertise-addr=tikv2:20160
+      - --data-dir=/data/tikv2
+      - --pd=pd1:2379,pd2:2379,pd3:2379
+    depends_on:
+      - pd1
+      - pd2
+      - pd3
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.labels.role==slave1]
+
+  tikv3:
+    hostname: tikv3      
+    image: pingcap/tikv:latest
+    ports:
+      - 20162:20160
+    volumes:
+      - /data/tidb/tikv3:/data/tikv3
+    networks:
+      swarm-net:
+        aliases:
+          - tikv3
+    environment:
+      TZ: Asia/Shanghai
+    command:
+      - --addr=0.0.0.0:20160
+      - --advertise-addr=tikv3:20160
+      - --data-dir=/data/tikv3
+      - --pd=pd1:2379,pd2:2379,pd3:2379
+    depends_on:
+      - pd1
+      - pd2
+      - pd3
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.labels.role==slave2]
+
+  tidb1:
+    hostname: tidb1
+    image: pingcap/tidb:latest
+    ports:
+      - "4000:4000"
+      - "10080:10080"
+    networks:
+      swarm-net:
+        aliases:
+          - tidb1
+    environment:
+      TZ: Asia/Shanghai         
+    command:
+      - --store=tikv
+      - --path=pd1:2379,pd2:2379,pd3:2379
+    depends_on:
+      - tikv1
+      - tikv2
+      - tikv3
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.labels.role==master]
+
+  tidb2:
+    hostname: tidb2
+    image: pingcap/tidb:latest
+    ports:
+      - "4001:4000"
+      - "10081:10080"
+    networks:
+      swarm-net:
+        aliases:
+          - tidb2
+    environment:
+      TZ: Asia/Shanghai
+    command:
+      - --store=tikv
+      - --path=pd1:2379,pd2:2379,pd3:2379
+    depends_on:
+      - tikv1
+      - tikv2
+      - tikv3
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.labels.role==slave1]
+
+  tidb3:
+    hostname: tidb3
+    image: pingcap/tidb:latest
+    ports:
+      - "4002:4000"
+      - "10082:10080"
+    networks:
+      swarm-net:
+        aliases:
+          - tidb3
+    environment:
+      TZ: Asia/Shanghai         
+    command:
+      - --store=tikv
+      - --path=pd1:2379,pd2:2379,pd3:2379
+    depends_on:
+      - tikv1
+      - tikv2
+      - tikv3
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.labels.role==slave2]
+
+networks:
+  swarm-net:
+    external:
+      name: swarm-net

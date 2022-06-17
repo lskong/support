@@ -1,0 +1,5 @@
+select switchover_status,database_role from v$database;
+alter database commit to switchover to physical standby with session shutdown;
+startup;
+select database_role,protection_mode,protection_level,open_mode from v$database;
+exit;

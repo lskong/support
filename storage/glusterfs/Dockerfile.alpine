@@ -1,0 +1,8 @@
+FROM alpine
+
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
+
+RUN apk add git automake autoconf libtool build-base rpcgen flex bison openssl-dev
+RUN apk add libuuid util-linux-dev acl-dev zlib-dev python3-dev libxml2-dev argp-standalone
+RUN apk add libtirpc-dev userspace-rcu-dev fuse-dev
+
