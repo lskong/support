@@ -215,6 +215,17 @@ step chooseleaf firstn -1 type host   # num=-1，从rep_hdd入口，选择2个ho
 step emit
 ```
 
+- 创建crush rule
+
+```bash
+ceph osd crush rule create-replicated rule-ssd default host ssd
+
+ceph osd crush rule ls
+
+
+```
+
+
 ## 亚节点纠删
 
 首先，正常的纠删码规则是到host级别（表现形式为N+M），也就是当配置就删码规则为4+2时，需要最少6个节点。

@@ -95,6 +95,10 @@ ssh-copy-id -i .ssh/id_rsa.pub root@node3
 ssh node1
 ssh node2
 ssh node3
+
+swapoff -a
+sed -ri 's/.*swap.*/#&/' /etc/fstab
+
 ```
 
 #### 3.3.4 关闭安全设置
@@ -723,6 +727,9 @@ ceph daemon osd.0 config diff
 
 // 配置文件检查
 ceph -c ceph.conf health
+
+// 临时修改配置
+ceph tell mon.* injectargs '--mon_osd_down_out_interval 600'
 ```
 
 ##### 3.4.8.2 配置文件详解
@@ -1617,6 +1624,7 @@ reboot
 // vm.swappiness
 # swap是系统虚拟内存。使用虚拟内存会导致性能下降，应该避免使用。
 # 默认值60，应该关闭swap的使用，将参数设置为0
+
 sudo sysctl vm.swappiness=0
 
 // pid_max
