@@ -1,0 +1,19 @@
+---
+version: '2.1'
+
+services:
+  tidb1:
+    image: pingcap/tidb:latest
+    ports:
+      - "4000:4000"
+      - "10080:10080"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    command:
+      - --store=tikv
+      - --path=pd1:2379,pd2:2379,pd3:2379
+    depends_on:
+      - "tikv1"
+      - "tikv2"
+      - "tikv3"
+    restart: on-failure

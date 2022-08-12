@@ -1,0 +1,130 @@
+version: "3.8"
+networks:
+  macvlan10:
+    external:
+      name: macvlan10
+
+services:
+  node1-yig0:
+    image: docker.xdxoazq.com.cn/library/yig:v1
+    container_name:   node1-yig0
+    restart: always
+    networks:
+      macvlan10:
+        ipv4_address: "10.0.0.80"
+    volumes:
+      - ./etc/ceph/:/etc/ceph/
+      - ./etc/yig/:/etc/yig/
+      - ./yig0/log:/var/log/yig
+    command: /etc/yig/yig
+
+  node1-yig1:
+    image: docker.xdxoazq.com.cn/library/yig:v1
+    container_name: node1-yig1
+    restart: always
+    networks:
+      macvlan10:
+        ipv4_address: "10.0.0.81"
+    volumes:
+      - ./etc/ceph/:/etc/ceph/
+      - ./etc/yig/:/etc/yig/
+      - ./yig1/log:/var/log/yig
+    command: /etc/yig/yig
+
+  node1-yig2:
+    image: docker.xdxoazq.com.cn/library/yig:v1
+    container_name: node1-yig2
+    networks:
+      macvlan10:
+        ipv4_address: "10.0.0.82"
+    volumes:
+      - ./etc/ceph/:/etc/ceph/
+      - ./etc/yig/:/etc/yig/
+      - ./yig2/log:/var/log/yig
+    command: /etc/yig/yig
+
+  node1-yig3:
+    image: docker.xdxoazq.com.cn/library/yig:v1
+    container_name: node1-yig3
+    networks:
+      macvlan10:
+        ipv4_address: "10.0.0.83"
+    volumes:
+      - ./etc/ceph/:/etc/ceph/
+      - ./etc/yig/:/etc/yig/
+      - ./yig3/log:/var/log/yig
+    command: /etc/yig/yig
+  
+  node1-yig4:
+    image: docker.xdxoazq.com.cn/library/yig:v1
+    container_name: node1-yig4
+    restart: always
+    networks:
+      macvlan10:
+        ipv4_address: "10.0.0.84"
+    volumes:
+      - ./etc/ceph/:/etc/ceph/
+      - ./etc/yig/:/etc/yig/
+      - ./yig4/log:/var/log/yig
+    command: /etc/yig/yig
+
+  node1-yig5:
+    image: docker.xdxoazq.com.cn/library/yig:v1
+    container_name: node1-yig5
+    networks:
+      macvlan10:
+        ipv4_address: "10.0.0.85"
+    volumes:
+      - ./etc/ceph/:/etc/ceph/
+      - ./etc/yig/:/etc/yig/
+      - ./yig5/log:/var/log/yig
+    command: /etc/yig/yig
+
+  node1-yig6:
+    image: docker.xdxoazq.com.cn/library/yig:v1
+    container_name: node1-yig6
+    networks:
+      macvlan10:
+        ipv4_address: "10.0.0.86"
+    volumes:
+      - ./etc/ceph/:/etc/ceph/
+      - ./etc/yig/:/etc/yig/
+      - ./yig6/log:/var/log/yig
+    command: /etc/yig/yig
+
+  node1-yig7:
+    image: docker.xdxoazq.com.cn/library/yig:v1
+    container_name: node1-yig7
+    restart: always
+    networks:
+      macvlan10:
+        ipv4_address: "10.0.0.87"
+    volumes:
+      - ./etc/ceph/:/etc/ceph/
+      - ./etc/yig/:/etc/yig/
+      - ./yig7/log:/var/log/yig
+    command: /etc/yig/yig
+
+  node1-yig8:
+    image: docker.xdxoazq.com.cn/library/yig:v1
+    container_name: node1-yig8
+    networks:
+      macvlan10:
+        ipv4_address: "10.0.0.88"
+    volumes:
+      - ./etc/ceph/:/etc/ceph/
+      - ./etc/yig/:/etc/yig/
+      - ./yig8/log:/var/log/yig
+    command: /etc/yig/yig
+
+  node1-yig9:
+    image: docker.xdxoazq.com.cn/library/yig:v1
+    container_name: node1-yig9
+    networks:
+      macvlan10:
+        ipv4_address: "10.0.0.89"
+    volumes:
+      - ./etc/ceph/:/etc/ceph/
+      - ./etc/yig/:/etc/yig/
+      - ./yig9/log:/var/log/yig
+    command: /etc/yig/yig

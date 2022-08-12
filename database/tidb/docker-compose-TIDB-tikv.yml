@@ -1,0 +1,21 @@
+---
+version: '2.1'
+
+services:
+   tikv1:
+      image: pingcap/tikv:latest
+      ports:
+        - "20160:20160"
+      volumes:
+        - /etc/localtime:/etc/localtime:ro
+        - /data:/data
+      command:
+        - --addr=0.0.0.0:20160
+        - --advertise-addr=tikv1:20160
+        - --data-dir=/data/tikv1
+        - --pd=pd1:2379,pd2:2379,pd3:2379
+      depends_on:
+        - "pd1"
+        - "pd2"
+        - "pd3"
+      restart: on-failure

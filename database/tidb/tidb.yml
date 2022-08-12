@@ -1,0 +1,73 @@
+version: "3.8"
+
+networks:
+  macvlan10:
+    external:
+      name: macvlan10
+
+services:
+  pd1:
+    hostname: pd1
+    container_name: pd1
+    image: pingcap/pd:latest
+    ports:
+      - "2379:2379"
+      - "2380:2380"
+    volumes:
+      - /data/tidb/pd1:/data/pd1
+    environment:
+      TZ: Asia/Shanghai
+    command:
+      - --name=pd1
+      - --data-dir=/data/pd1
+      - --client-urls=http://0.0.0.0:2379
+      - --peer-urls=http://0.0.0.0:2380
+      - --advertise-client-urls=http://10.0.0.111:2379
+      - --advertise-peer-urls=http://10.0.0.111:2380
+      - --initial-cluster=pd1=http://10.0.0.111:2380,pd2=http://10.0.0.112:2380,pd3=http://10.0.0.113:2380
+    networks:
+      macvlan10:
+        ipv4_address: 10.0.0.111
+
+  tikv1:
+    hostname: tikv1
+    container_name: tikv1
+    image: pingcap/tikv:latest
+    ports:
+      - 20160:20160
+    volumes:
+      - /data/tidb/tikv1:/data/tikv1
+    environment:
+      TZ: Asia/Shanghai
+    command:
+      - --addr=0.0.0.0:20160
+      - --advertise-addr=10.0.0.114:20160
+      - --data-dir=/data/tikv1
+      - --pd=10.0.0.111:2379,10.0.0.112:2379,10.0.0.113:2379
+    depends_on:
+      - pd1
+      - pd2
+      - pd3
+    networks:
+      macvlan10:
+        ipv4_address: 10.0.0.114
+
+  tidb1:
+    hostname: tidb1
+    container_name: tidb1
+    image: pingcap/tidb:latest
+    ports:
+      - "4000:4000"
+      - "10080:10080"
+    environment:
+      TZ: Asia/Shanghai
+    command:
+      - --store=tikv
+      - --path=10.0.0.111:2379,10.0.0.112:2379,10.0.0.113:2379
+    depends_on:
+      - tikv1
+      - tikv2
+      - tikv3
+    networks:
+      macvlan10:
+        ipv4_address: 10.0.0.117

@@ -1,0 +1,74 @@
+global:
+  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      - 172.16.1.23:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  - /alertrule/*.yml
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'prometheus'
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+    static_configs:
+    - targets: ['localhost:9090']
+
+  - job_name: 'ceph'
+    static_configs:
+       - targets: ['172.16.1.23:9283']
+
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['172.16.1.21:9100']
+      - targets: ['172.16.1.23:9100']
+      - targets: ['172.16.1.24:9100']
+      - targets: ['172.16.1.25:9100']
+      - targets: ['172.16.1.26:9100']
+      - targets: ['172.16.1.27:9100']
+      - targets: ['172.16.1.28:9100']
+
+  - job_name: 'cadvisor-manager'
+    static_configs:
+      - targets: ['172.16.1.21:8080']
+      - targets: ['172.16.1.23:8080']
+      - targets: ['172.16.1.24:8080']
+      - targets: ['172.16.1.25:8080']
+      - targets: ['172.16.1.26:8080']
+      - targets: ['172.16.1.27:8080']
+      - targets: ['172.16.1.28:8080']
+
+  - job_name: 'tidb-db'
+    honor_labels: true
+    static_configs:
+      - targets: ['172.16.1.26:10080']
+      - targets: ['172.16.1.27:10080']
+      - targets: ['172.16.1.28:10080']
+
+  - job_name: 'tidb-pd'
+    honor_labels: true
+    static_configs:
+      - targets: ['172.16.1.26:2379']
+      - targets: ['172.16.1.27:2379']
+      - targets: ['172.16.1.28:2379']
+
+  - job_name: 'tidb-kv'
+    honor_labels: true
+    static_configs:
+      - targets: ['172.16.1.26:20180']
+      - targets: ['172.16.1.27:20180']
+      - targets: ['172.16.1.28:20180']

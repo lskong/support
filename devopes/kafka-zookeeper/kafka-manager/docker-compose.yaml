@@ -1,0 +1,20 @@
+version: '3.8'
+networks:
+  macvlan10:
+    external:
+      name: macvlan10
+
+services:
+  kafka-manager:
+    image: sheepkiller/kafka-manager:latest
+    restart: unless-stopped
+    container_name: kafka-manager
+    hostname: kafka-manager
+    ports:
+      - 9000:9000
+    environment:
+      ZK_HOSTS: 10.0.0.101:2181,10.0.0.102:2181,10.0.0.103:2181
+      KAFKA_BROKERS: 10.0.0.104:9092,10.0.0.105:9092,10.0.0.106:9092
+    networks:
+      macvlan10:
+        ipv4_address: 10.0.0.100
