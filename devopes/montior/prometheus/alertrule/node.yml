@@ -1,0 +1,226 @@
+groups:
+- name: CephCluster
+  rules:
+  - alert: 集群运行状态处于警告状态
+    expr: ceph_health_status == 1
+    for: 30s
+    labels:
+      severity: warning
+    annotations:
+      title: 集群运行状态处于警告状态
+      description: 存储集群运行状态处于警告状态
+  - alert: 集群运行状态处于错误状态
+    expr: ceph_health_status > 1
+    for: 30s
+    labels:
+      severity: critical
+    annotations:
+      title: 集群运行状态处于错误状态
+      description: 集群运行状态处于错误状态
+  - alert: Monitor服务
+    expr: ceph_mon_quorum_status != 1
+    for: 5s
+    labels:
+      severity: critical
+    annotations:
+      title: Monitor服务
+      description: Monitor节点服务Down
+  - alert: 集群OSD使用率高
+    expr: (ceph_osd_stat_bytes_used / ceph_osd_stat_bytes) * 100 > 80
+    for: 30s
+    labels:
+      severity: major
+    annotations:
+      title: 集群OSD使用率高
+      description: 集群【{{ $labels.ceph_daemon }}】 使用率超过80%
+  - alert: 集群OSD Down
+    expr: ceph_osd_up < 0.5
+    for: 30s
+    labels:
+      severity: major
+    annotations:
+      title: 集群OSD掉线
+      description: 集群【{{ $labels.ceph_daemon }}】 掉线
+  - alert: OSD 分配PGs高
+    expr: abs(((ceph_osd_pgs > 0) - on (job) group_left avg(ceph_osd_pgs > 0) by (job))
+      / on (job) group_left avg(ceph_osd_pgs > 0) by (job)) > 0.35
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      title: OSD 分配PGs高
+      description: 集群【{{ $labels.ceph_daemon }}】 分配的PGs高于30%
+  - alert: OSD 延时高
+    expr: ((irate(node_disk_read_time_seconds_total[5m]) / clamp_min(irate(node_disk_reads_completed_total[5m]),
+      1) + irate(node_disk_write_time_seconds_total[5m]) / clamp_min(irate(node_disk_writes_completed_total[5m]),
+      1)) and on (instance, device) ceph_disk_occupation) > 1
+    for: 30s
+    labels:
+      severity: major
+    annotations:
+      title: OSD 延时高
+      description:  集群【{{ $labels.ceph_daemon }}】延时大于1秒
+  - alert: 存储池容量低
+    expr: (ceph_pool_bytes_used / (ceph_pool_bytes_used + ceph_pool_max_avail) * 100
+      + on (pool_id) group_left (name) (ceph_pool_metadata*0)) > 1
+    for: 30s
+    labels:
+      severity: major
+    annotations:
+      title: 存储池容量低
+      description: 存储池容量低
+  - alert: 集群容量低
+    expr: sum(ceph_osd_stat_bytes_used) / sum(ceph_osd_stat_bytes) > 0.85
+    for: 30s
+    labels:
+      severity: major
+    annotations:
+      title: 集群容量低
+      description: 集群存储空间已使用超过85%
+- name: Node
+  rules:
+  - alert: 节点服务掉线
+    expr: up{job=~"node-exporter|prometheus|grafana|alertmanager|ClusterNode"}
+      == 0
+    for: 10s
+    labels:
+      severity: major
+    annotations:
+      title: 节点服务掉线
+      description: '节点: 【{{ $labels.instance }}】掉线已超过1分钟'
+  - alert: 节点CPU负载
+    expr: sum(node_load5) by (instance) > 30
+    for: 30s
+    labels:
+      severity: warning
+    annotations:
+      title: 节点CPU负载
+      description: '节点: 【{{ $labels.instance }}】 5五分钟内CPU负载超过30 (当前值：{{ $value }})'
+  - alert: 节点CPU使用率
+    expr: (1-((sum(increase(node_cpu_seconds_total{mode="idle"}[5m])) by (instance))/(sum(increase(node_cpu_seconds_total[5m]))
+      by (instance))))*100 > 50
+    for: 30s
+    labels:
+      severity: warning
+    annotations:
+      title: 节点CPU使用率
+      description: '节点: 【{{ $labels.instance }}】 5五分钟内CPU使用率超过50% (当前值：{{ $value }})'
+  - alert: 节点内存使用
+    expr: (1-((node_memory_Buffers_bytes + node_memory_Cached_bytes + node_memory_MemFree_bytes)/node_memory_MemTotal_bytes))*100
+      > 60
+    for: 30s
+    labels:
+      severity: warning
+    annotations:
+      title: 节点内存使用
+      description: '节点: 【{{ $labels.instance }}】 内存使用率超过60% (当前使用率：{{ $value }}%)'
+  - alert: 节点磁盘负载过高
+    expr: ((sum(increase(node_cpu_seconds_total{mode="iowait"}[5m])) by (instance))/(sum(increase(node_cpu_seconds_total[5m]))
+      by (instance)))*100 > 70
+    for: 30s
+    labels:
+      severity: major
+    annotations:
+      title: 节点磁盘负载过高
+      description: '节点: 【{{ $labels.instance }}】 5五分钟内磁盘负载过高70 (当前负载值：{{ $value }})'
+  - alert: 节点文件系统使用
+    expr: (1-(node_filesystem_free_bytes{fstype=~"ext4|xfs",mountpoint!~".*tmp|.*boot"
+      }/node_filesystem_size_bytes{fstype=~"ext4|xfs",mountpoint!~".*tmp|.*boot"}))*100 
+      > 80
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      title: 节点文件系统使用
+      description: '节点: 【{{ $labels.instance }}】 {{ $labels.mountpoint }}分区使用率超过80%,
+        当前值使用率：{{ $value }}%'
+  - alert: 节点网络丢包
+    expr: sum by (instance, device) (irate(node_network_receive_drop_total{device=~"(eth|en|bond|ib|mlx|p).*"}[5m])
+      + irate(node_network_receive_errs_total{device=~"(eth|en|bond|ib|mlx|p).*"}[5m])
+      + irate(node_network_transmit_drop_total{device=~"(eth|en|bond|ib|mlx|p).*"}[5m])
+      + irate(node_network_transmit_errs_total{device=~"(eth|en|bond|ib|mlx|p).*"}[5m]))
+      > 1
+    for: 1m
+    labels:
+      severity: major
+    annotations:
+      title: 节点网络丢包
+      description: 每5分钟有大于10个数据被丢包
+  - alert: 节点网络连接数
+    expr: sum(node_netstat_Tcp_CurrEstab) by (instance) > 4000
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      title: 节点网络连接数
+      description: '节点: 【{{ $labels.instance }}】 ESTABLISHED连接数超过4000, 当前ESTABLISHED连接数:
+        {{ $value }}'
+  - alert: 节点网络连接等待
+    expr: sum(node_sockstat_TCP_tw) by (instance) > 4000
+    for: 30s
+    labels:
+      severity: major
+    annotations:
+      title: 节点网络连接等待
+      description: '节点: 【{{ $labels.instance }}】 TIME_WAIT连接数超过4000, 当前TIME_WAIT连接数:
+        {{ $value }}'
+  - alert: 节点网络吞吐量流入
+    expr: sum by (instance, device) (rate(node_network_receive_bytes_total{device=~"ens.*"}[2m]))
+      / 1024 / 1024 > 800
+    for: 30s
+    labels:
+      severity: warning
+    annotations:
+      title: 节点网络吞吐量流入
+      description: '节点: 【{{ $labels.instance }}】, 网卡: {{ $labels.device }} 入口流量超过(>
+        800 MB/s), 当前值: {{ $value }}'
+  - alert: 节点网络吞吐量输出
+    expr: sum by (instance, device) (rate(node_network_transmit_bytes_total{device=~"ens.*"}[2m]))
+      / 1024 / 1024 > 800
+    for: 30s
+    labels:
+      severity: warning
+    annotations:
+      title: 节点网络吞吐量输出
+      description: '节点: 【{{ $labels.instance }}】, 网卡: {{ $labels.device }} 出口流量超过(>
+        800 MB/s), 当前值: {{ $value }}'
+  - alert: 节点磁盘读取吞吐量
+    expr: sum by (instance, device) (rate(node_disk_read_bytes_total{device=~"sd.*"}[2m]))
+      / 1024 / 1024> 100
+    for: 30s
+    labels:
+      severity: warning
+    annotations:
+      title: 节点磁盘读取吞吐量
+      description: '节点: 【{{ $labels.instance }}】, 磁盘: {{ $labels.device }} 读取速度超过(100
+        MB/s), 当前值: {{ $value }}'
+  - alert: 节点异常磁盘写入吞吐量
+    expr: sum by (instance, device) (rate(node_disk_written_bytes_total{device=~"sd.*"}[2m]))
+      / 1024 / 1024 > 100
+    for: 30s
+    labels:
+      severity: warning
+    annotations:
+      title: 节点异常磁盘写入吞吐量
+      description: '节点: 【{{ $labels.instance }}】, 磁盘: {{ $labels.device }} 写入速度超过(100
+        MB/s), 当前值: {{ $value }}'
+  - alert: 节点磁盘读取延迟
+    expr: rate(node_disk_read_time_seconds_total{device=~"sd.*"}[1m]) / rate(node_disk_reads_completed_total{device=~"sd.*"}[1m])
+      > 0.1 and rate(node_disk_reads_completed_total{device=~"sd.*"}[1m]) > 100
+    for: 30s
+    labels:
+      severity: major
+    annotations:
+      title: 节点磁盘读取延迟
+      description: '节点: 【{{ $labels.instance }}】, 磁盘: {{ $labels.device }} Read延迟过高(read
+        operations > 100ms), 当前延迟值: {{ $value }}m'
+  - alert: 节点磁盘写入延迟
+    expr: rate(node_disk_write_time_seconds_total{device=~"sd.*"}[1m]) / rate(node_disk_writes_completed_total{device=~"sd.*"}[1m])
+      > 0.1 and rate(node_disk_writes_completed_total{device=~"sd.*"}[1m]) > 100
+    for: 30s
+    labels:
+      severity: major
+    annotations:
+      title: 节点磁盘写入延迟
+      description: '节点: 【{{ $labels.instance }}】, 磁盘: {{ $labels.device }} Write延迟过高(write operations > 100ms), 当前延迟值: {{ $value }}m'
+

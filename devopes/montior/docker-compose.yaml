@@ -1,4 +1,4 @@
-version: '3'
+version: '3.0'
 
 services:
   prometheus:
@@ -6,14 +6,17 @@ services:
     container_name: prometheus
     hostname: prometheus
     restart: always
-  
-    # centos 注意目录权限777
     volumes:
       - /etc/localtime:/etc/localtime
       - ./prometheus/config:/etc/prometheus
       - ./prometheus/data:/prometheus
       - ./prometheus/alertrule:/alertrule
-
+    links:
+      - cadvisor:cadvisor
+      - alertmanager:alertmanager
+      - snmp-exporter:snmp-exporter
+    depends_on:
+      - cadvisor
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -22,12 +25,10 @@ services:
       - '--storage.tsdb.retention.time=200h'
       - '--web.enable-lifecycle'
     ports:
-      - "19090:9090"
+      - "9090:9090"
     networks:
-      - monitor 
+      - monitor
 
-
-  # chmod 777 ./grafana
   grafana:
     image: grafana/grafana
     container_name: grafana
@@ -36,13 +37,17 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime
       - ./grafana/data:/var/lib/grafana
-      - ./grafana/conf/defaults.ini:/usr/share/grafana/conf/defaults.ini
+      - ./grafana/config/defaults.ini:/usr/share/grafana/conf/defaults.ini
     environment:
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=123456
-      - GF_USERS_ALLOW_SIGN_UP=false  
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    links:
+      - prometheus:prometheus
+    depends_on:
+      - prometheus
     ports:
-      - "13000:3000"
+      - "3000:3000"
     networks:
       - monitor
 
@@ -59,7 +64,7 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
     ports:
-      - "18080:8080"
+      - "8080:8080"
     networks:
       - monitor
 
@@ -74,12 +79,12 @@ services:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
     ports:
-      - "19100:9100"
+      - "9100:9100"
     command:
       - --path.procfs=/host/proc
       - --path.rootfs=/rootfs
       - --path.sysfs=/host/sys
-      - --collector.filesystem.ignored-mount-points='^/(sys|proc|dev|host|etc)($$|/)'
+      - --collector.filesystem.ignored-mount-points='^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)'
     networks:
       - monitor
 
@@ -93,7 +98,43 @@ services:
       - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
       - ./alertmanager/data:/alertmanager
     ports:
-      - "19093:9093"
+      - "9093:9093"
+    networks:
+      - monitor
+
+  snmp-exporter:
+    image: prom/snmp-exporter
+    container_name: snmp-exporter
+    hostname: snmp-exporter
+    restart: always
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./snmp-exporter/config/:/etc/snmp_exporter/
+    ports:
+      - "9116:9116"
+    networks:
+      - monitor
+
+  drawio:
+    image: jgraph/drawio
+    container_name: drawio
+    restart: unless-stopped
+    ports:
+      - 8081:8080
+      - 8443:8443
+    environment:
+      PUBLIC_DNS: domain
+      ORGANISATION_UNIT: unit
+      ORGANISATION: org
+      CITY: city
+      STATE: state
+      COUNTRY_CODE: country
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://domain:8080 || exit 1"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 5
+      #start_period: 10s
     networks:
       - monitor
 

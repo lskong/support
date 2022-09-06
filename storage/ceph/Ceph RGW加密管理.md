@@ -61,10 +61,10 @@ OS ubuntu18.04
 
 ```bash
 # 下载vault镜像
-docker pull vault
+$ sudo docker pull vault
 
 # 启动vault
-docker run -d -p 8200:8200 --name vault vault:latest
+$ sudo docker run -d -p 8200:8200 --name vault vault:latest
 
 # 查看vault初始化结果
 [root@rock-c76-dev ~]# docker logs -f vault
@@ -94,7 +94,7 @@ http://172.16.103.254:8200/
 
 ```bash
 # 进入器
-[root@rock-c76-dev ~]# docker exec -it vault sh
+$ sudo docker exec -it vault sh
 / # vault --version
 Vault v1.10.1 (e452e9b30a9c2c8adfa1611c26eb472090adc767)
 
@@ -187,6 +187,9 @@ http://172.16.103.254:8200/v1/secret/data/rgw/bucket-a1
 
 ## /v1/secret/data  密钥路径前缀
 ## rgw/bucket-a1    密钥路径ID
+
+## GET
+## X-Vault-Token
 ```
 
 
@@ -232,10 +235,10 @@ rgw_crypt_require_ssl = false
 
 
 ## 重启所有rgw服务
-systemctl restart ceph-radosgw.target
+$ sudo systemctl restart ceph-radosgw.target
 
 ## 查看配置
-root@node01:~# ceph config show rgw.node01|grep rgw
+$ sudo ceph config show rgw.node01|grep rgw
 rgw_crypt_require_ssl               false                                                                                                                                  
 rgw_crypt_s3_kms_backend            vault                                                                                                                                      
 rgw_crypt_vault_addr                http://172.16.103.254:8200                                                                                                                 
@@ -254,10 +257,10 @@ debug_rgw = 20/20
 
 ```bash
 # 安装s3cmd
-apt -y install s3cmd
+$ sudo apt -y install s3cmd
 
 # s3cmd配置文件
-root@node01:~# cat .s3cfg 
+$ sudo cat .s3cfg 
 [default]
 access_key = 11XU0FCPA1U6PUHJIPRQ
 secret_key = fBifUxvfD8Dl7t23TRelDTK8HfobglsoFTBAimDZ
